@@ -1,0 +1,17 @@
+# Byte-compiled / compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+
+# Database
+database.sqlite3
+
+
+
+
+
+
+
