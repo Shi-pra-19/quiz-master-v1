@@ -135,4 +135,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()  
         create_test_data()
-    app.run(port=5007)
+    app.run(debug=True)

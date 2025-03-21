@@ -1,11 +1,182 @@
-from flask import Blueprint
+from flask import Blueprint, Flask, redirect, url_for, render_template, request, flash
 from flask_login import login_user, login_required, current_user, logout_user
-from flask import Flask, redirect, url_for, render_template, request, flash
+from extensions import db
+from model import Subject, User, Chapter, Question, Quiz
+from sqlalchemy.orm import joinedload
+from datetime import datetime
 
 admin = Blueprint("admin", __name__)
+
 
 @admin.route('/home')
 @login_required
 def home():
-    return render_template('admin_home.html')
+    if not current_user.is_admin():
+        return redirect(url_for('home'))
+
+    subjects = Subject.query.options(
+        joinedload(Subject.chapters)
+        .joinedload(Chapter.quizzes)
+        .joinedload(Quiz.questions)
+    ).all()
+    
+    return render_template('admin_home.html', subjects=subjects)
+
+
+@admin.route('/user')
+def user():
+    users = User.query.filter(User.role != 'admin').all()
+    return render_template('admin_user.html', users=users)
+
+
+@admin.route('/quiz')
+@login_required
+def quiz():
+    quizzes = Quiz.query.all()
+    chapters = Chapter.query.all()
+    return render_template('admin_quiz.html', quizzes=quizzes, chapters=chapters)
+
+
+@admin.route('/add_subject', methods=['POST'])
+def add_subject():
+    subject_name = request.form.get('subject_name')
+    subject_description = request.form.get('subject_description')
+
+    if subject_name:
+        new_subject = Subject(name=subject_name, description=subject_description)
+        db.session.add(new_subject)
+        db.session.commit()
+        flash("Subject added successfully!", "success")
+    
+    return redirect(url_for('admin.home'))
+
+@admin.route('/edit_subject/<int:subject_id>', methods=['POST'])
+def edit_subject(subject_id):
+    subject = Subject.query.get_or_404(subject_id)
+    subject.name = request.form['subject_name']
+    subject.description = request.form['subject_description']
+
+    db.session.commit()
+    flash('Subject updated successfully!', 'success')
+    return redirect(url_for('admin.home'))
+
+@admin.route('/delete_subject/<int:subject_id>', methods=['POST'])
+def delete_subject(subject_id):
+    subject = Subject.query.get_or_404(subject_id)
+    db.session.delete(subject)
+    db.session.commit()
+
+    flash("Subject deleted successfully!", "danger")
+    return redirect(url_for('admin.home'))
+
+
+@admin.route('/add_chapter/<int:subject_id>', methods=['POST'])
+def add_chapter(subject_id):
+    chapter_name = request.form.get('chapter_name')
+    chapter_description = request.form.get('chapter_description')
+
+    if not chapter_name or not chapter_description:
+        flash("Both fields are required!", "danger")
+        return redirect(url_for('admin.home'))
+
+    new_chapter = Chapter(name=chapter_name, description=chapter_description, subject_id=subject_id)
+    db.session.add(new_chapter)
+    db.session.commit()
+
+    flash("New chapter added successfully!", "success")
+    return redirect(url_for('admin.home'))
+
+@admin.route('/edit_chapter/<int:chapter_id>', methods=['POST'])
+def edit_chapter(chapter_id):
+    chapter = Chapter.query.get_or_404(chapter_id)
+    chapter.name = request.form['chapter_name']
+    chapter.description = request.form['chapter_description']
+
+    db.session.commit()
+    flash("Chapter updated successfully!", "success")
+    return redirect(url_for('admin.home'))
+
+@admin.route('/delete_chapter/<int:chapter_id>', methods=['POST'])
+def delete_chapter(chapter_id):
+    chapter = Chapter.query.get_or_404(chapter_id)
+    db.session.delete(chapter)
+    db.session.commit()
+
+    flash("Chapter deleted successfully!", "success")
+    return redirect(url_for('admin.home'))
+
+@admin.route('/add_quiz', methods=['POST'])
+def add_quiz():
+    new_quiz = Quiz(
+        chapter_id=request.form.get('chapter_id'),
+        date=request.form.get('date'),
+        duration=request.form.get('duration'),
+        remarks=request.form.get('remarks')
+    )
+    db.session.add(new_quiz)
+    db.session.commit()
+
+    flash('New quiz created successfully!', 'success')
+    return redirect(url_for('admin.quiz'))
+
+@admin.route('/edit_quiz/<int:quiz_id>', methods=['POST'])
+def edit_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    quiz.date = datetime.strptime(request.form['date'], "%Y-%m-%d").date()
+    quiz.duration = request.form['duration']
+    
+    db.session.commit()
+    flash("Quiz updated successfully!", "success")
+    return redirect(url_for('admin.quiz'))
+
+@admin.route('/delete_quiz/<int:quiz_id>', methods=['POST'])
+def delete_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    db.session.delete(quiz)
+    db.session.commit()
+
+    flash('Quiz deleted successfully!', 'success')
+    return redirect(url_for('admin.quiz'))
+
+
+@admin.route('/add_question/<int:quiz_id>', methods=['POST'])
+def add_question(quiz_id):
+    new_question = Question(
+        quiz_id=quiz_id,
+        ques_statement=request.form['ques_statement'],
+        option_a=request.form['option_a'],
+        option_b=request.form['option_b'],
+        option_c=request.form['option_c'],
+        option_d=request.form['option_d'],
+        correct=request.form['correct']
+    )
+    
+    db.session.add(new_question)
+    db.session.commit()
+
+    flash('New question added successfully!', 'success')
+    return redirect(url_for('admin.quiz'))
+
+@admin.route('/edit_question/<int:question_id>', methods=['POST'])
+def edit_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    question.ques_statement = request.form['ques_statement']
+    question.option_a = request.form['option_a']
+    question.option_b = request.form['option_b']
+    question.option_c = request.form['option_c']
+    question.option_d = request.form['option_d']
+    question.correct = request.form['correct']
+
+    db.session.commit()
+    flash('Question updated successfully!', 'success')
+    return redirect(url_for('admin.quiz'))
+
+@admin.route('/delete_question/<int:question_id>', methods=['POST'])
+def delete_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    db.session.delete(question)
+    db.session.commit()
+
+    flash('Question deleted successfully!', 'success')
+    return redirect(url_for('admin.quiz'))
 
