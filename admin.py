@@ -24,7 +24,10 @@ def home():
 
 
 @admin.route('/user')
+@login_required
 def user():
+    if not current_user.is_admin():
+        return redirect(url_for('home'))
     users = User.query.filter(User.role != 'admin').all()
     return render_template('admin_user.html', users=users)
 
@@ -32,6 +35,8 @@ def user():
 @admin.route('/quiz')
 @login_required
 def quiz():
+    if not current_user.is_admin():
+        return redirect(url_for('home'))
     quizzes = Quiz.query.all()
     chapters = Chapter.query.all()
     return render_template('admin_quiz.html', quizzes=quizzes, chapters=chapters)
@@ -109,7 +114,7 @@ def delete_chapter(chapter_id):
 def add_quiz():
     new_quiz = Quiz(
         chapter_id=request.form.get('chapter_id'),
-        date=request.form.get('date'),
+        date=datetime.strptime(request.form['date'], "%Y-%m-%d").date(),
         duration=request.form.get('duration'),
         remarks=request.form.get('remarks')
     )
