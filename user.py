@@ -14,7 +14,7 @@ def home():
     today = date.today()
     quizzes = Quiz.query.filter(Quiz.date >= today).order_by(Quiz.date).all()
     past_quizzes = Quiz.query.filter(Quiz.date < today).order_by(Quiz.date.desc()).all()
-    return render_template('user_home.html', quizzes=quizzes, past_quizzes=past_quizzes)
+    return render_template('user_home.html', quizzes=quizzes, past_quizzes=past_quizzes,today=today)
 
 
 @user.route('/subject')

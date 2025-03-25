@@ -60,10 +60,15 @@
                                View
                                 </button>
     
+                                {% if quiz.date == today %}
+                              
+                                <a href="{{ url_for('user.start_quiz', quiz_id=quiz.id) }}" class="btn btn-success btn-sm">Start Quiz</a>
+                            {% else %}
                                
-                                <a href="{{ url_for('user.start_quiz', quiz_id=quiz.id) }}" class="btn btn-success btn-sm">
-                              Start
-                                </a>
+                                <p >Coming Soon</p>
+                            {% endif %}
+                       
+                    
                             </td>
                         </tr>
                         {% endfor %}
@@ -71,7 +76,7 @@
                 </table>
 
                 {% for quiz in quizzes %}
-                <!-- Quiz Details Modal -->
+            
                 <div class="modal fade" id="quizModal{{ quiz.id }}" tabindex="-1" aria-labelledby="quizModalLabel{{ quiz.id }}" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -81,7 +86,7 @@
                             </div>
                             <div class="modal-body">
                                 <p><strong>Chapter:</strong> {{ quiz.chapter.name }}</p>
-                                <p><strong>Subject</strong> {{ quiz.chapter.name }}</p>
+                                <p><strong>Subject</strong> {{ quiz.chapter.subject.name }}</p>
                                 <p><strong>Number of Questions:</strong> {{ quiz.questions|length or "No remarks" }}</p>
                                 <p><strong>Date:</strong> {{ quiz.date.strftime('%Y-%m-%d') }}</p>
                                 <p><strong>Duration:</strong> {{ quiz.duration }} minutes</p>
