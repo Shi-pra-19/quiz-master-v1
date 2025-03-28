@@ -15,12 +15,36 @@
         .card-container .card {
             width: 100%; 
         }
+       
+        body {
+            background-color: #FAFFC7; 
+        }
+        
+        .navbar {
+            background-color: #ADD8E6 !important;  /* Pastel Green */
+        }
+    
+       
+    
+        .btn-primary {
+            background-color: #ADD8E6 !important; /* Pastel Blue */
+            border-color: none;
+            color: black;
+        }
+        .btn-primary:hover {
+                background-color: #ADD8E6 ; 
+            }
+        .card {
+            background-color: #F8C8DC !important;
+            border: none;
+        }
+    
     </style>
 </head>
 <body class="bg-light text-dark">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg ">
         <div class="container-fluid">
-            <h3 class="text-white m-0">Quiz Master</h3>
+            <h3 class=" m-0">Quiz Master 📚</h3>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -39,10 +63,12 @@
                         <a class="nav-link" href="{{ url_for('user.search') }}">Search</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.summary') }}">Summary</a>
+                    </li>                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                     </li>
                 </ul>
-                <span class="navbar-text text-white">
+                <span class="navbar-text">
                     Welcome, {{ current_user.full_name }}!
                 </span>
             </div>
@@ -51,18 +77,18 @@
     <div class="container mt-5">
         <div class="card-container">
             <div class="card shadow p-4 text-center">
-                <h2 class="text-success">Quiz Completed</h2>
+                <h2 class="text-success">Quiz Completed 🎉</h2>
                 <h4>Your Score: {{ score }}/{{ total }}</h4>
                 <h5>Correct Answers: {{ correct_count }} / {{ total }}</h5>
             </div>
 
            
             <div class="card mt-4 p-3">
-                <h3>Question Results</h3>
+                <h3>Question Feedback 📖</h3>
                 <table class="table table-bordered">
                     <thead class="table-dark">
                         <tr>
-                            <th>Question</th>
+                            <th>Question </th>
                             <th>Your Answer</th>
                             <th>Correct Answer</th>
                             <th>Result</th>
@@ -89,14 +115,14 @@
 
            
             <div class="card mt-4 p-3">
-                <h3>All Past Attempts</h3>
+                <h3>All Past Attempts 👇</h3>
                 {% if past_attempts %}
                     <table class="table table-striped text-center">
                         <thead class="table-dark">
                             <tr>
                                 <th>#</th>
-                                <th>Date</th>
-                                <th>Score</th>
+                                <th>Date 📅</th>
+                                <th>Score ✒</th>
                             </tr>
                         </thead>
                         <tbody>

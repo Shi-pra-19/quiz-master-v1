@@ -5,6 +5,8 @@ from datetime import date, datetime, timedelta
 from extensions import db
 from collections import defaultdict
 from sqlalchemy.sql import func
+import plotly.graph_objs as go
+import plotly.offline as pyo
 
 user = Blueprint("user", __name__)
 
@@ -78,6 +80,57 @@ def scores():
         highest_quiz_name=highest_quiz_name,
         avg_score=avg_score,
         avg_attempts_per_quiz=avg_attempts_per_quiz)
+
+
+@user.route('/summary')
+def summary():
+    user_id = current_user.id  
+    subjects = Subject.query.all()
+    subject_names = [subject.name for subject in subjects]
+
+    num_quizzes = []
+    top_scores = []
+
+    for subject in subjects:
+        quizzes = Quiz.query.join(Chapter).filter(Chapter.subject_id == subject.id).all()
+        num_quizzes.append(len(quizzes)) 
+
+       
+        user_scores = []
+        for quiz in quizzes:
+            score = Score.query.filter_by(quiz_id=quiz.id, user_id=user_id).order_by(Score.score.desc()).first()
+            if score:
+                user_scores.append(score.score)
+
+        top_scores.append(max(user_scores) if user_scores else 0)
+
+    
+    pastel_colors = ["#FAFFC7", "#ADD8E6"] 
+    
+    quiz_fig = go.Figure()
+    quiz_fig.add_trace(go.Bar(
+        x=subject_names,
+        y=num_quizzes,
+        marker_color=pastel_colors[0],  
+        name="No. of Quizzes"
+    ))
+    quiz_fig.update_layout(title="Number of Quizzes per Subject", xaxis_title="Subjects", yaxis_title="No. of Quizzes")
+
+    
+    score_fig = go.Figure()
+    score_fig.add_trace(go.Bar(
+        x=subject_names,
+        y=top_scores,
+        marker_color=pastel_colors[1],  
+        name="Top Scores"
+    ))
+    score_fig.update_layout(title="Your Top Scores per Subject", xaxis_title="Subjects", yaxis_title="Top Score")
+
+   
+    quiz_plot_html = pyo.plot(quiz_fig, output_type="div")
+    score_plot_html = pyo.plot(score_fig, output_type="div")
+
+    return render_template('user_summary.html', quiz_plot=quiz_plot_html, score_plot=score_plot_html)
 
 @user.route('/start_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required

@@ -1,9 +1,11 @@
 from flask import Blueprint, Flask, redirect, url_for, render_template, request, flash
 from flask_login import login_user, login_required, current_user, logout_user
 from extensions import db
-from model import Subject, User, Chapter, Question, Quiz
+from model import Subject, User, Chapter, Question, Quiz,Score
 from sqlalchemy.orm import joinedload
 from datetime import datetime
+import plotly.graph_objs as go
+import plotly.offline as pyo
 
 admin = Blueprint("admin", __name__)
 
@@ -63,6 +65,46 @@ def search():
             results = db.session.query(Question).filter(Question.ques_statement.ilike(f"%{query}%")).all()
 
     return render_template('admin_search.html', search_type=search_type, query=query, results=results)
+
+
+@admin.route('/summmary')
+def summary():
+    subjects = Subject.query.all()
+    subject_names = [subject.name for subject in subjects]
+
+    top_scores = []
+    user_attempts = []
+
+    for subject in subjects:
+        quizzes = Quiz.query.join(Chapter).filter(Chapter.subject_id == subject.id).all()
+
+        max_score = 0
+        attempts = 0
+        for quiz in quizzes:
+            scores = Score.query.filter_by(quiz_id=quiz.id).all()
+            if scores:
+                max_score = max(max_score, max(score.score for score in scores))
+                attempts += len(scores)
+
+        top_scores.append(max_score)
+        user_attempts.append(attempts)
+
+    pastel_colors = ["#FAFFC7", "#ADD8E6"]
+
+    score_fig = go.Figure()
+    score_fig.add_trace(go.Bar(x=subject_names, y=top_scores, marker_color= pastel_colors[0], name="Top Scores"))
+    score_fig.update_layout(title="Top Scores per Subject", xaxis_title="Subjects", yaxis_title="Top Score")
+
+    
+    attempts_fig = go.Figure()
+    attempts_fig.add_trace(go.Bar(x=subject_names, y=user_attempts, marker_color=pastel_colors[1], name="User Attempts"))
+    attempts_fig.update_layout(title="User Attempts per Subject", xaxis_title="Subjects", yaxis_title="Number of Attempts")
+
+   
+    score_plot_html = pyo.plot(score_fig, output_type="div")
+    attempts_plot_html = pyo.plot(attempts_fig, output_type="div")
+
+    return render_template('admin_summary.html', score_plot=score_plot_html, attempts_plot=attempts_plot_html)
 
 
 @admin.route('/add_subject', methods=['POST'])
