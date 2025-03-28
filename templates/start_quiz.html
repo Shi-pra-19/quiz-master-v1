@@ -8,27 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
    
 </head>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let duration = {{ quiz.duration }} * 60; 
-        let timerDisplay = document.getElementById("timer");
-
-        function updateTimer() {
-            let minutes = Math.floor(duration / 60);
-            let seconds = duration % 60;
-            timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            
-            if (duration <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById("quizForm").submit(); 
-            }
-            duration--;
-        }
-
-        updateTimer();
-        let timerInterval = setInterval(updateTimer, 1000); 
-    });
-</script>
 
 <body class="bg-light text-dark">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -46,7 +25,8 @@
         <div class="card shadow p-4">
             <h2 class="text-center text-primary">{{ quiz.chapter.name }} Quiz</h2>
             <p class="text-center text-danger fw-bold">
-                Time Remaining: <span id="timer">{{ quiz.duration }}:00</span> minutes
+                Quiz Duration:{{ quiz.duration }} minutes
+                <small class="text-muted">⚠️ If you exceed the quiz duration, your score will be set to <strong>zero</strong>.</small>
             </p>
             <hr>
 
