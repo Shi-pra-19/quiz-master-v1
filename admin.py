@@ -41,6 +41,29 @@ def quiz():
     chapters = Chapter.query.all()
     return render_template('admin_quiz.html', quizzes=quizzes, chapters=chapters)
 
+@admin.route('/search', methods=['GET'])
+@login_required
+def search():
+    search_type = request.args.get('search_type', 'subject')  
+    query = request.args.get('query', '').strip()
+    
+    results = []
+
+    if query:
+        if search_type == 'subject':
+            results = db.session.query(Subject).filter(Subject.name.ilike(f"%{query}%")).all()
+        elif search_type == 'quiz':
+            results = db.session.query(Quiz).join(Chapter).join(Subject).filter(Quiz.chapter.has(Chapter.name.ilike(f"%{query}%"))).all()
+        elif search_type == 'user':
+            results = db.session.query(User).filter(
+                (User.full_name.ilike(f"%{query}%")) | 
+                (User.email.ilike(f"%{query}%"))
+            ).all()
+        elif search_type == 'question':
+            results = db.session.query(Question).filter(Question.ques_statement.ilike(f"%{query}%")).all()
+
+    return render_template('admin_search.html', search_type=search_type, query=query, results=results)
+
 
 @admin.route('/add_subject', methods=['POST'])
 def add_subject():

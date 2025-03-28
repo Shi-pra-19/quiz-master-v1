@@ -23,6 +23,25 @@ def subject():
     subjects = Subject.query.all()
     return render_template('user_subject.html', subjects = subjects)
 
+
+@user.route('/search', methods=['GET'])
+@login_required
+def search():
+    search_type = request.args.get('search_type', 'subject')  # Default to 'subject'
+    query = request.args.get('query', '').strip()
+
+    results = []
+
+    if query:
+        if search_type == 'subject':
+            results = db.session.query(Subject).filter(Subject.name.ilike(f"%{query}%")).all()
+        elif search_type == 'quiz':
+            results = db.session.query(Quiz).join(Chapter).join(Subject).filter(Quiz.chapter.has(Chapter.name.ilike(f"%{query}%"))).all()
+
+    return render_template('user_search.html', search_type=search_type, query=query, results=results)
+
+
+
 @user.route('/scores')
 @login_required
 def scores():
