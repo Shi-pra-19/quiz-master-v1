@@ -6,12 +6,36 @@
     <title>Register - Quiz Master</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+   
+    body {
+        background-color: #FAFFC7; 
+    }
+
+    
+    .card {
+        background-color: #F8C8DC;
+        border-radius: 10px;
+    }
+
+    
+    .btn-dark {
+        background-color: #ADD8E6; 
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background-color:#ADD8E6; 
+        
+    }
+</style>
+
 <body class="bg-light">
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-8 mb-2">
                 <div class="card shadow-lg p-4">
-                    <h2 class="text-center mb-4">Create an Account</h2>
+                    <h2 class="text-center mb-4">Create an Account 🧾</h2>
 
 
                     {% with messages = get_flashed_messages(with_categories=True) %}
@@ -28,62 +52,62 @@
                     <form method="POST">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="full_name" class="form-label">Full Name</label>
+                                <label for="full_name" class="form-label">Full Name 📛</label>
                                 <input type="text" class="form-control" id="full_name" name="full_name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
+                                <label for="email" class="form-label">Email 📧</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="password" class="form-label">Password 🔐</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="confirm_password" class="form-label">Confirm Password</label>
+                                <label for="confirm_password" class="form-label">Confirm Password ✔</label>
                                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="dob" class="form-label">Date of Birth</label>
+                                <label for="dob" class="form-label">Date of Birth 📆</label>
                                 <input type="date" class="form-control" id="dob" name="dob">
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="education_level" class="form-label">Education Level</label>
+                                <label for="education_level" class="form-label">Education Level 🎓</label>
                                 <input type="text" class="form-control" id="education_level" name="education_level">
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="qualifications" class="form-label">Qualifications</label>
+                            <label for="qualifications" class="form-label">Qualifications 🏢</label>
                             <input type="text" class="form-control" id="qualifications" name="qualifications">
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="institute_name" class="form-label">Institute Name</label>
+                                <label for="institute_name" class="form-label">Institute Name 🏫</label>
                                 <input type="text" class="form-control" id="institute_name" name="institute_name">
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="field_of_study" class="form-label">Field of Study</label>
+                                <label for="field_of_study" class="form-label">Field of Study 🔬</label>
                                 <input type="text" class="form-control" id="field_of_study" name="field_of_study">
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-dark w-100">Register</button>
+                        <button type="submit" class="btn btn-dark w-100">Register </button>
                     </form>
 
                     <p class="text-center mt-3">
-                        Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none">Login here</a>
+                        Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none">Login here 👈</a>
                     </p>
                 </div>
             </div>
