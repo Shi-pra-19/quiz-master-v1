@@ -39,7 +39,7 @@
 
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <h3 class=" m-0">Quiz Master  📚</h1> 
+            <h3 class=" m-0">Quiz Master  📚</h3> 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -288,10 +288,7 @@
             </div>
             <div class="modal-body">
                 <form method="POST" action="{{ url_for('admin.add_quiz') }}">
-                    <div class="mb-3">
-                        <label class="form-label">Quiz Name</label>
-                        <input type="text" class="form-control" name="quiz_name" required>
-                    </div>
+                    
                     <div class="mb-3">
                         <label class="form-label">Chapter</label>
                         <select class="form-select" name="chapter_id" required>

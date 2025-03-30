@@ -8,6 +8,7 @@ from werkzeug.security import check_password_hash
 from datetime import datetime
 from admin import admin
 from user import user
+from api import api_bp
 
 @login_manager.unauthorized_handler
 def unauthorized():
@@ -23,6 +24,7 @@ login_manager.init_app(app)
 
 app.register_blueprint(admin, url_prefix="/admin")
 app.register_blueprint(user, url_prefix="/user")
+app.register_blueprint(api_bp, url_prefix="/api")
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -45,36 +47,49 @@ def home():
 def register():
    
     if current_user.is_authenticated:
-        return redirect(url_for('admin.admin_dashboard') if current_user.is_admin() else url_for('user.user_dashboard'))
+        return redirect(url_for('admin.home') if current_user.is_admin() else url_for('user.home'))
 
     if request.method == 'POST':
         full_name = request.form.get('full_name')
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        dob = request.form.get('dob')
+        dob_str = request.form.get('dob')
         education_level = request.form.get('education_level')
         qualifications = request.form.get('qualifications')
         institute_name = request.form.get('institute_name')
         field_of_study = request.form.get('field_of_study')
 
-       
-        if password != confirm_password:
-            flash("Passwords do not match!", "danger")
+        if not full_name or not email or not password or not confirm_password:
+            flash("All fields are required!", "danger")
+            return redirect(url_for('register'))
+
+        if not all(c.isalpha() or c.isspace() for c in full_name):
+            flash("Full name should contain only letters and spaces!", "danger")
+            return redirect(url_for('register'))
+
+        if "@" not in email or "." not in email:
+            flash("Invalid email format!", "danger")
+            return redirect(url_for('register'))
+
+        if len(password) < 8:
+            flash("Password must be at least 8 characters long!", "danger")
             return redirect(url_for('register'))
 
         if User.query.filter_by(email=email).first():
             flash("Email is already registered!", "danger")
             return redirect(url_for('register'))
 
-      
-        dob_date = datetime.strptime(dob, "%Y-%m-%d").date() if dob else None
+        if password != confirm_password:
+            flash("Passwords do not match!", "danger")
+            return redirect(url_for('register'))
 
-       
+        dob = datetime.strptime(dob_str, "%Y-%m-%d").date() if dob_str else None
+
         new_user = User(
             full_name=full_name,
             email=email,
-            dob=dob_date,
+            dob=dob,
             education_level=education_level,
             qualifications=qualifications,
             institute_name=institute_name,
@@ -91,7 +106,7 @@ def register():
 
       
         return redirect(url_for('user.home'))
-
+    
     return render_template('register.html')
 
 

@@ -30,7 +30,7 @@
     }
 </style>
 
-<body class="bg-light">
+<body>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8 mb-2">
@@ -53,7 +53,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">Full Name 📛</label>
-                                <input type="text" class="form-control" id="full_name" name="full_name" required>
+                                <input type="text" class="form-control" id="full_name" name="full_name" required pattern="[A-Za-z\s]+" title="Only letters and spaces allowed">
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -65,12 +65,12 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Password 🔐</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                                <input type="password" class="form-control" id="password" name="password" required minlength="8">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="confirm_password" class="form-label">Confirm Password ✔</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="8">
                             </div>
                         </div>
 

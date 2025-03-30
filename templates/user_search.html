@@ -19,7 +19,7 @@
 
     .btn-primary {
         background-color: #ADD8E6 !important; /* Pastel Blue */
-        border-color: none;
+        border: none;
         color: black;
     }
    
@@ -33,14 +33,14 @@
    
 </style>
 
-<body class="bg-light">
+<body>
     <nav class="navbar navbar-expand-lg ">
         <div class="container-fluid">
             <h3 class=" m-0">Quiz Master 📚</h3>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse">
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('user.home') }}">Home</a>

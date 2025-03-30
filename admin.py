@@ -46,6 +46,8 @@ def quiz():
 @admin.route('/search', methods=['GET'])
 @login_required
 def search():
+    if not current_user.is_admin():
+        return redirect(url_for('home'))
     search_type = request.args.get('search_type', 'subject')  
     query = request.args.get('query', '').strip()
     
@@ -68,7 +70,10 @@ def search():
 
 
 @admin.route('/summmary')
+@login_required
 def summary():
+    if not current_user.is_admin():
+        return redirect(url_for('home'))
     subjects = Subject.query.all()
     subject_names = [subject.name for subject in subjects]
 
@@ -181,7 +186,6 @@ def add_quiz():
         chapter_id=request.form.get('chapter_id'),
         date=datetime.strptime(request.form['date'], "%Y-%m-%d").date(),
         duration=request.form.get('duration'),
-        remarks=request.form.get('remarks')
     )
     db.session.add(new_quiz)
     db.session.commit()

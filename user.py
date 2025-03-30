@@ -13,6 +13,9 @@ user = Blueprint("user", __name__)
 @user.route('/home')
 @login_required
 def home():
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
+
     today = date.today()
     quizzes = Quiz.query.filter(Quiz.date >= today).order_by(Quiz.date).all()
     past_quizzes = Quiz.query.filter(Quiz.date < today).order_by(Quiz.date.desc()).all()
@@ -22,6 +25,8 @@ def home():
 @user.route('/subject')
 @login_required
 def subject():
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
     subjects = Subject.query.all()
     return render_template('user_subject.html', subjects = subjects)
 
@@ -29,7 +34,10 @@ def subject():
 @user.route('/search', methods=['GET'])
 @login_required
 def search():
-    search_type = request.args.get('search_type', 'subject')  # Default to 'subject'
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
+
+    search_type = request.args.get('search_type', 'subject')  
     query = request.args.get('query', '').strip()
 
     results = []
@@ -47,6 +55,8 @@ def search():
 @user.route('/scores')
 @login_required
 def scores():
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
     scores = (
         db.session.query(Score, Quiz, Chapter)
         .join(Quiz, Score.quiz_id == Quiz.id)
@@ -83,7 +93,11 @@ def scores():
 
 
 @user.route('/summary')
+@login_required
 def summary():
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
+
     user_id = current_user.id  
     subjects = Subject.query.all()
     subject_names = [subject.name for subject in subjects]
@@ -135,6 +149,9 @@ def summary():
 @user.route('/start_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
 def start_quiz(quiz_id):
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
+
     quiz = Quiz.query.get_or_404(quiz_id)
 
     if 'quiz_start_time' not in session or session.get('current_quiz_id') != quiz_id:
@@ -193,6 +210,8 @@ def start_quiz(quiz_id):
 @user.route('/quiz_result/<int:quiz_id>')
 @login_required
 def quiz_result(quiz_id):
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
    
     quiz_data = session.get('quiz_results', {})
     
