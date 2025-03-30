@@ -154,35 +154,22 @@ def start_quiz(quiz_id):
 
     quiz = Quiz.query.get_or_404(quiz_id)
 
-    if 'quiz_start_time' not in session or session.get('current_quiz_id') != quiz_id:
-        session['quiz_start_time'] = datetime.utcnow().isoformat()
-        session['current_quiz_id'] = quiz_id  
-
-   
     if request.method == 'GET':
         return render_template('start_quiz.html', quiz=quiz)
 
-   
-    start_time = datetime.fromisoformat(session['quiz_start_time'])
-    end_time = start_time + timedelta(minutes=quiz.duration)
-    is_time_up = datetime.utcnow() > end_time
-
-    
     score = 0
     total = len(quiz.questions)
     user_answers = {}
 
     for question in quiz.questions:
-        selected_answer = request.form.get(str(question.id)) if not is_time_up else None
+        selected_answer = request.form.get(str(question.id))
         user_answers[str(question.id)] = selected_answer
         if selected_answer == question.correct:
             score += 1
 
     percentage = (score / total) * 100 if total > 0 else 0
-    if is_time_up:
-        percentage = 0  
 
-   
+    
     new_score = Score(
         user_id=current_user.id,
         quiz_id=quiz.id,
@@ -192,18 +179,12 @@ def start_quiz(quiz_id):
     db.session.add(new_score)
     db.session.commit()
 
-   
-    session.pop('quiz_start_time', None)
-    session.pop('current_quiz_id', None)
-
+    
     session['quiz_results'] = {
         'score': score,
         'total': total,
         'user_answers': user_answers
     }
-
-    if is_time_up:
-        flash("Time's up! Your quiz was automatically submitted.", "warning")
 
     return redirect(url_for('user.quiz_result', quiz_id=quiz.id))
 
